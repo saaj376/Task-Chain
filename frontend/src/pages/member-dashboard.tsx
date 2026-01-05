@@ -69,12 +69,13 @@ export default function MemberDashboard() {
     setToken(tokenParam)
     // Restore "Joined" state
     const savedTeam = localStorage.getItem("taskchain_joinedTeam")
-    if (savedTeam) {
+
+    if (tokenParam) {
+      setActiveTab("join")
+    } else if (savedTeam) {
       setJoinedTeam(savedTeam)
       setTeamId(savedTeam)
-      if (!tokenParam) setActiveTab("tasks")
-    } else if (tokenParam) {
-      setActiveTab("join")
+      setActiveTab("tasks")
     }
 
     // Silent wallet check
