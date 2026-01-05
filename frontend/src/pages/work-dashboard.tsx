@@ -4,7 +4,7 @@ import axios from "axios"
 import { checkWalletConnection, connectWallet } from "../services/wallet"
 import { Terminal, Code, GitCommit, RefreshCw, AlertTriangle, File as FileIcon, Save, Wallet } from "lucide-react"
 
-const API = "http://localhost:5000"
+const API = "http://localhost:5001"
 
 interface WorkspaceFile {
   path: string

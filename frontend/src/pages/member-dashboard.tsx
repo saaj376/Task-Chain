@@ -4,7 +4,7 @@ import { connectWallet, checkWalletConnection } from "../services/wallet"
 import { claimTaskOnChain, completeTaskOnChain } from "../services/contract"
 import confetti from "canvas-confetti"
 
-const API = "http://localhost:5000"
+const API = "http://localhost:5001"
 
 interface Task {
   id: string
