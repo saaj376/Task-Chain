@@ -13,5 +13,6 @@ app.use("/receipt", routes.receiptRoutes)
 app.use("/task", routes.taskRoutes)
 app.use("/team", routes.teamRoutes)
 app.use("/workspace", routes.workspaceRoutes)
+app.use("/clickup", routes.clickupRoutes)
 
 export default app
