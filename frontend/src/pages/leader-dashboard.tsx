@@ -2,6 +2,22 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import { connectWallet } from "../services/wallet"
 import { createTaskOnChain } from "../services/contract"
+import {
+  Wallet,
+  PlusCircle,
+  Users,
+  Plus,
+  Folder,
+  Clock,
+  List,
+  RefreshCw,
+  Link as LinkIcon,
+  Settings,
+  Copy,
+  Check,
+  Shield,
+  Rocket
+} from "lucide-react"
 
 const API = "http://localhost:5000"
 
@@ -26,9 +42,9 @@ export default function LeaderDashboard() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [status, setStatus] = useState("")
   const [copied, setCopied] = useState(false)
-  const [activeTab, setActiveTab] = useState<"invite" | "tasks">("invite")
-  const [taskFormOpen, setTaskFormOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<"tasks" | "invite">("tasks") // Default to tasks to match image
 
+  // Task Form State
   const [taskForm, setTaskForm] = useState({
     title: "",
     description: "",
@@ -36,6 +52,24 @@ export default function LeaderDashboard() {
     deadline: "",
     reward: "",
   })
+
+  useEffect(() => {
+    // Initial load
+    checkWallet()
+  }, [])
+
+  useEffect(() => {
+    if (activeTab === "tasks") {
+      fetchTasks()
+    } else if (activeTab === "invite") {
+      fetchMembers()
+    }
+  }, [activeTab, teamId])
+
+  async function checkWallet() {
+    // Check if already connected (mock check/restore if lib supports, otherwise wait for user)
+    // For now purely relying on explicit connect unless stored
+  }
 
   async function connectAndLoad() {
     try {
@@ -88,7 +122,7 @@ export default function LeaderDashboard() {
 
     try {
       setStatus("⏳ Creating task on blockchain...")
-      
+
       const metadata = JSON.stringify({
         title: taskForm.title,
         description: taskForm.description,
@@ -97,11 +131,11 @@ export default function LeaderDashboard() {
       const metadataHash = "0x" + Array.from(new TextEncoder().encode(metadata))
         .map(b => b.toString(16).padStart(2, '0'))
         .join('').slice(0, 64)
-      
+
       const deadlineTimestamp = Math.floor(new Date(taskForm.deadline).getTime() / 1000)
       const gracePeriod = 86400
       const priority = parseInt(taskForm.priority)
-      
+
       const taskId = await createTaskOnChain(
         metadataHash,
         "General",
@@ -122,21 +156,15 @@ export default function LeaderDashboard() {
       }
 
       await axios.post(`${API}/task/create`, { teamId, task: newTask })
-      
+
       setTasks([...tasks, newTask])
       setTaskForm({ title: "", description: "", priority: "1", deadline: "", reward: "" })
-      setTaskFormOpen(false)
       setStatus(`✅ Task #${taskId} created on blockchain!`)
       await fetchTasks()
     } catch (err: any) {
       setStatus("❌ " + (err.response?.data?.error || err.message))
     }
   }
-  useEffect(() => {
-    if (activeTab === "tasks") {
-      fetchTasks()
-    }
-  }, [activeTab])
 
   function copyToClipboard() {
     navigator.clipboard.writeText(inviteUrl)
@@ -144,558 +172,920 @@ export default function LeaderDashboard() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  // --- Helpers for styling ---
   const getPriorityColor = (priority: number) => {
-    if (priority >= 8) return "#f44336"
-    if (priority >= 5) return "#ff9800"
-    return "#4caf50"
+    if (priority >= 8) return "#ff3333"; // Critical RED
+    if (priority >= 5) return "#ff9900"; // High ORANGE
+    return "#00ff88"; // Normal GREEN
   }
 
   const getPriorityLabel = (priority: number) => {
-    if (priority >= 8) return "🔴 Critical"
-    if (priority >= 5) return "🟡 High"
-    return "🟢 Normal"
+    if (priority >= 8) return "CRITICAL";
+    if (priority >= 5) return "HIGH";
+    return "NORMAL";
   }
+
+  // Calculate stats
+  const pendingTasks = tasks.filter(t => t.status === 'open').length;
 
   return (
     <div style={styles.container}>
-      <div style={styles.header}>
-        <h1>�� Team Leader Dashboard</h1>
-        <p style={styles.subtitle}>Manage team invites & create tasks</p>
-      </div>
-
-      {address && (
-        <div style={styles.walletCard}>
-          <span>✓ Connected:</span>
-          <span style={styles.address}>{address.slice(0, 6)}...{address.slice(-4)}</span>
+      {/* Top Navigation Bar */}
+      <header style={styles.header}>
+        <div style={styles.logoArea}>
+          <div style={styles.logoIcon}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00ff88" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M2 17L12 22L22 17" stroke="#00ff88" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M2 12L12 17L22 12" stroke="#00ff88" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </div>
+          <div>
+            <h1 style={styles.title}>TaskChain</h1>
+            <p style={styles.subtitle}>PROTOCOL CONSOLE</p>
+          </div>
         </div>
-      )}
 
-      {!address && (
-        <button onClick={connectAndLoad} style={styles.connectBtn}>
-          🔗 Connect Wallet
-        </button>
-      )}
+        <div style={styles.headerTitle}>Leader Dashboard</div>
 
-      {status && (
-        <div
-          style={{
-            ...styles.status,
-            background: status.includes("✅") ? "#c8e6c9" : status.includes("🔗") || status.includes("✓") ? "#e3f2fd" : "#ffcdd2",
-            color: status.includes("✅") ? "#2e7d32" : status.includes("🔗") || status.includes("✓") ? "#1565c0" : "#c62828",
-          }}
-        >
-          {status}
-        </div>
-      )}
-
-      {/* Tabs */}
-      <div style={styles.tabs}>
-        <button
-          onClick={() => setActiveTab("invite")}
-          style={{
-            ...styles.tab,
-            borderBottom: activeTab === "invite" ? "3px solid #667eea" : "none",
-            color: activeTab === "invite" ? "#667eea" : "#666",
-          }}
-        >
-          🔗 Team Invites
-        </button>
-        <button
-          onClick={() => setActiveTab("tasks")}
-          style={{
-            ...styles.tab,
-            borderBottom: activeTab === "tasks" ? "3px solid #667eea" : "none",
-            color: activeTab === "tasks" ? "#667eea" : "#666",
-          }}
-        >
-          📋 Tasks ({tasks.length})
-        </button>
-      </div>
-
-      {/* Invite Tab */}
-      {activeTab === "invite" && (
-        <div style={styles.grid}>
-          {/* Generate Invite */}
-          <div style={styles.card}>
-            <h2>➕ Generate Invite Link</h2>
-
-            <label style={styles.label}>
-              <div>Team ID</div>
-              <input
-                value={teamId}
-                onChange={e => setTeamId(e.target.value)}
-                style={styles.input}
-                placeholder="e.g., team-123"
-              />
-            </label>
-
-            <label style={styles.label}>
-              <div>Link Expiry (seconds)</div>
-              <input
-                type="number"
-                value={ttlSeconds}
-                onChange={e => setTtlSeconds(e.target.value)}
-                style={styles.input}
-                placeholder="3600"
-              />
-            </label>
-
-            <button onClick={handleGenerateInvite} style={styles.buttonPrimary}>
-              🔗 Generate Invite
+        <div style={styles.headerActions}>
+          <div style={styles.betaBadge}>Mainnet Beta</div>
+          {address ? (
+            <div style={styles.walletBadge}>
+              <Wallet size={14} />
+              {address.slice(0, 6)}...{address.slice(-2)}
+              <span style={styles.connectedText}>Connected</span>
+            </div>
+          ) : (
+            <button onClick={connectAndLoad} style={styles.connectBtnSmall}>
+              Connect Wallet
             </button>
+          )}
+        </div>
+      </header>
 
-            {inviteUrl && (
-              <div style={styles.inviteBox}>
-                <div style={styles.inviteTitle}>📋 Your Invite Link</div>
-                <div style={styles.inviteUrlText}>{inviteUrl}</div>
-                <button onClick={copyToClipboard} style={{...styles.button, background: copied ? "#4CAF50" : "#2196F3"}}>
-                  {copied ? "✓ Copied!" : "Copy Link"}
-                </button>
+      {/* Sub Header / Status Bar */}
+      <div style={styles.statusBar}>
+        <div style={styles.statusLeft}>
+          <div style={{ ...styles.statusDot, background: address ? "#00ff88" : "#ff3333" }}></div>
+          <span style={styles.statusText}>{address ? "CONNECTED" : "DISCONNECTED"}</span>
+          <span style={styles.divider}>|</span>
+          <span style={styles.sessionText}>Session Hash:</span>
+          <span style={styles.hashTag}>0x9f...2b1a</span>
+        </div>
+        <div>
+          {status && <span style={styles.statusMessage}>{status}</span>}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div style={styles.main}>
+
+        {/* Tab Navigation */}
+        <div style={styles.tabNav}>
+          <button
+            onClick={() => setActiveTab("tasks")}
+            style={styles.tabBtn(activeTab === "tasks")}
+          >
+            <PlusCircle size={16} /> Task Creation
+          </button>
+          <button
+            onClick={() => setActiveTab("invite")}
+            style={styles.tabBtn(activeTab === "invite")}
+          >
+            <Users size={16} /> Team Invites
+          </button>
+        </div>
+
+        {/* Section Title */}
+        <div style={styles.sectionHeader}>
+          <div style={styles.sectionTitleBorder}></div>
+          <h2 style={styles.sectionTitle}>
+            {activeTab === "tasks" ? "Task Creation" : "Team Invites"}
+          </h2>
+          <div style={styles.protocolText}>PROTOCOL V2.1 // ACTIVE</div>
+        </div>
+
+        {activeTab === "tasks" && (
+          <div style={styles.contentGrid(activeTab)}>
+
+            {/* Left Column: Create Task Form */}
+            <div style={styles.card}>
+              <div style={styles.cardHeader}>
+                <h3 style={styles.cardTitle}>
+                  <Plus size={20} style={styles.plusIcon} /> Create Task
+                </h3>
+                <span style={styles.onChainBadge}>ON-CHAIN</span>
               </div>
-            )}
-          </div>
 
-          {/* Team Members */}
-          <div style={styles.card}>
-            <h2>👥 Team Members</h2>
-            <button onClick={fetchMembers} style={styles.button}>
-              🔄 Refresh
-            </button>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>TASK TITLE</label>
+                <input
+                  style={styles.input}
+                  placeholder="e.g. Audit Smart Contract v2"
+                  value={taskForm.title}
+                  onChange={e => setTaskForm({ ...taskForm, title: e.target.value })}
+                />
+              </div>
 
-            <div style={styles.membersList}>
-              {members.length === 0 ? (
-                <div style={styles.emptyState}>
-                  <p>No members yet</p>
-                  <p style={styles.smallText}>Share the invite link to add members</p>
-                </div>
-              ) : (
-                members.map((member, i) => (
-                  <div key={i} style={styles.memberItem}>
-                    <span style={styles.memberIcon}>{(i + 1).toString().padStart(2, "0")}</span>
-                    <span style={styles.memberAddress}>{member.slice(0, 6)}...{member.slice(-4)}</span>
-                  </div>
-                ))
-              )}
-            </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>TASK DESCRIPTION</label>
+                <textarea
+                  style={styles.textarea}
+                  placeholder="Provide detailed specifications..."
+                  value={taskForm.description}
+                  onChange={e => setTaskForm({ ...taskForm, description: e.target.value })}
+                ></textarea>
+              </div>
 
-            <div style={styles.statsBox}>
-              <div><strong>Total Members:</strong> {members.length}</div>
-              <div><strong>Team ID:</strong> {teamId}</div>
-            </div>
-          </div>
-        </div>
-      )}
+              <div style={styles.formGroup}>
+                <label style={styles.label}>DEADLINE</label>
+                <input
+                  type="datetime-local"
+                  style={styles.input}
+                  value={taskForm.deadline}
+                  onChange={e => setTaskForm({ ...taskForm, deadline: e.target.value })}
+                />
+              </div>
 
-      {/* Tasks Tab */}
-      {activeTab === "tasks" && (
-        <div style={styles.grid}>
-          {/* Create Task */}
-          <div style={styles.card}>
-            <h2>➕ Create New Task</h2>
-
-            {!taskFormOpen ? (
-              <button onClick={() => setTaskFormOpen(true)} style={styles.buttonPrimary}>
-                + Create Task
-              </button>
-            ) : (
-              <div style={styles.form}>
-                <label style={styles.label}>
-                  <div>Task Title</div>
-                  <input
-                    value={taskForm.title}
-                    onChange={e => setTaskForm({ ...taskForm, title: e.target.value })}
-                    placeholder="e.g., Review Smart Contract"
-                    style={styles.input}
-                  />
-                </label>
-
-                <label style={styles.label}>
-                  <div>Description</div>
-                  <textarea
-                    value={taskForm.description}
-                    onChange={e => setTaskForm({ ...taskForm, description: e.target.value })}
-                    placeholder="Detailed task description..."
-                    style={{ ...styles.input, minHeight: "80px", resize: "none" }}
-                  />
-                </label>
-
-                <label style={styles.label}>
-                  <div>Priority Level</div>
+              <div style={styles.row}>
+                <div style={styles.formGroupHalf}>
+                  <label style={styles.label}>PRIORITY</label>
                   <select
+                    style={styles.select}
                     value={taskForm.priority}
                     onChange={e => setTaskForm({ ...taskForm, priority: e.target.value })}
-                    style={styles.input}
                   >
-                    <option value="1">🟢 Normal (1-3)</option>
-                    <option value="5">🟡 High (5-7)</option>
-                    <option value="8">🔴 Critical (8+)</option>
+                    <option value="1">Normal (0-100)</option>
+                    <option value="5">High (101-200)</option>
+                    <option value="9">Critical (200+)</option>
                   </select>
-                </label>
-
-                <label style={styles.label}>
-                  <div>Deadline</div>
-                  <input
-                    type="datetime-local"
-                    value={taskForm.deadline}
-                    onChange={e => setTaskForm({ ...taskForm, deadline: e.target.value })}
-                    style={styles.input}
-                  />
-                </label>
-
-                <label style={styles.label}>
-                  <div>Reward (optional)</div>
-                  <input
-                    value={taskForm.reward}
-                    onChange={e => setTaskForm({ ...taskForm, reward: e.target.value })}
-                    placeholder="e.g., 100 USDC"
-                    style={styles.input}
-                  />
-                </label>
-
-                <div style={styles.formButtons}>
-                  <button onClick={handleCreateTask} style={styles.buttonConfirm}>
-                    ✓ Create
-                  </button>
-                  <button
-                    onClick={() => setTaskFormOpen(false)}
-                    style={{ ...styles.button, background: "#999" }}
-                  >
-                    ✕ Cancel
-                  </button>
+                </div>
+                <div style={styles.formGroupHalf}>
+                  <label style={styles.label}>REWARD</label>
+                  <div style={styles.inputWithUnit}>
+                    <input
+                      style={styles.inputNoBorder}
+                      placeholder="0.0"
+                      value={taskForm.reward}
+                      onChange={e => setTaskForm({ ...taskForm, reward: e.target.value })}
+                    />
+                    <span style={styles.unit}>ETH</span>
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
 
-          {/* Task List */}
-          <div style={styles.card}>
-            <h2>📌 Team Tasks</h2>
+              <button style={styles.createChainBtn} onClick={handleCreateTask}>
+                <Rocket size={16} style={{ marginRight: 8 }} /> CREATE TASK (ON-CHAIN)
+              </button>
+              <div style={styles.secureText}>🔒 Transaction requires wallet signature</div>
+            </div>
 
-            <div style={styles.tasksList}>
-              {tasks.length === 0 ? (
-                <div style={styles.emptyState}>
-                  <p>No tasks yet</p>
-                  <p style={styles.smallText}>Create a task to get started</p>
-                </div>
-              ) : (
-                tasks.map(task => (
-                  <div key={task.id} style={styles.taskCard}>
-                    <div style={styles.taskHeader}>
-                      <div>
-                        <h3 style={styles.taskTitle}>{task.title}</h3>
-                        <p style={styles.taskDescription}>{task.description}</p>
-                      </div>
-                      <div
-                        style={{
-                          ...styles.badge,
-                          background: getPriorityColor(task.priority),
-                        }}
-                      >
-                        {getPriorityLabel(task.priority)}
-                      </div>
-                    </div>
+            {/* Right Column: Stats & Registry */}
+            <div style={styles.rightCol}>
 
-                    <div style={styles.taskMeta}>
-                      <div>
-                        <span style={styles.metaLabel}>📅 Deadline:</span>
-                        <span>{new Date(task.deadline).toLocaleDateString()}</span>
-                      </div>
-                      <div>
-                        <span style={styles.metaLabel}>💰 Reward:</span>
-                        <span>{task.reward}</span>
-                      </div>
-                      <div>
-                        <span style={styles.metaLabel}>Status:</span>
-                        <span
-                          style={{
-                            ...styles.statusBadge,
-                            background: task.status === "open" ? "#4CAF50" : "#2196F3",
-                          }}
-                        >
-                          {task.status.toUpperCase()}
-                        </span>
-                      </div>
-                    </div>
+              {/* Stats Row */}
+              <div style={styles.statsRow}>
+                <div style={styles.statCard}>
+                  <div style={styles.statLabel}>TOTAL TASKS</div>
+                  <div style={styles.statValue}>
+                    {tasks.length}
+                    <span style={styles.statSub}>+2 new</span>
                   </div>
-                ))
+                  <div style={styles.iconPos}>
+                    <Folder size={24} style={{ opacity: 0.2 }} />
+                  </div>
+                </div>
+                <div style={styles.statCard}>
+                  <div style={styles.statLabel}>PENDING</div>
+                  <div style={styles.statValue}>
+                    {pendingTasks}
+                    <span style={styles.statSubWarn}>Action req.</span>
+                  </div>
+                  <div style={styles.iconPos}>
+                    <Clock size={24} style={{ opacity: 0.2 }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Task Registry */}
+              <div style={styles.registryCard}>
+                <div style={styles.registryHeader}>
+                  <h3 style={styles.cardTitle}>
+                    <List size={20} style={styles.listIcon} /> Task Registry
+                  </h3>
+                  <div style={styles.registryActions}>
+                    <button onClick={fetchTasks} style={styles.iconBtn}><RefreshCw size={16} /></button>
+                  </div>
+                </div>
+
+                <div style={styles.tableHeader}>
+                  <div style={{ flex: 2 }}>TASK DETAILS</div>
+                  <div style={{ flex: 1 }}>PRIORITY</div>
+                  <div style={{ flex: 1 }}>STATUS</div>
+                  <div style={{ flex: 1, textAlign: 'right' }}>REWARD</div>
+                </div>
+
+                <div style={styles.taskList}>
+                  {tasks.length === 0 ? (
+                    <div style={styles.emptyState}>No tasks registered. Create one to begin.</div>
+                  ) : (
+                    tasks.map((task) => (
+                      <div key={task.id} style={styles.taskItem}>
+                        <div style={styles.taskItemMain}>
+                          <div style={styles.taskItemTitle}>{task.title}</div>
+                          <div style={styles.taskItemMeta}>🕒 {new Date(task.deadline).toLocaleDateString()} remaining</div>
+                        </div>
+                        <div style={styles.taskItemPriority}>
+                          <span style={{
+                            ...styles.priorityBadge,
+                            color: getPriorityColor(task.priority),
+                            borderColor: getPriorityColor(task.priority) + '44',
+                            background: getPriorityColor(task.priority) + '11'
+                          }}>
+                            {getPriorityLabel(task.priority)}
+                          </span>
+                        </div>
+                        <div style={styles.taskItemStatus}>
+                          <span style={styles.statusPill}>
+                            <span style={{ ...styles.statusDotSmall, background: task.status === 'completed' ? '#00ff88' : '#2196F3' }}></span>
+                            {task.status.toUpperCase()}
+                          </span>
+                        </div>
+                        <div style={styles.taskItemReward}>
+                          <span style={styles.rewardValue}>{task.reward || "0.0"}</span>
+                          <span style={styles.unitSmall}>ETH</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* Invite Tab UI */}
+        {activeTab === "invite" && (
+          <div style={styles.contentGrid(activeTab)}>
+            <div style={styles.card}>
+              <div style={styles.cardHeader}>
+                <h3 style={styles.cardTitle}>
+                  <LinkIcon size={20} style={styles.linkIcon} /> Invite Management
+                </h3>
+                <span style={styles.securedBadge}>SECURED</span>
+              </div>
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>TEAM ID</label>
+                <div style={styles.inputIconWrapper}>
+                  <span style={styles.inputPrefix}>#</span>
+                  <input
+                    style={styles.inputWithPrefix}
+                    value={teamId}
+                    onChange={e => setTeamId(e.target.value)}
+                    placeholder="team-123"
+                  />
+                </div>
+              </div>
+
+              <div style={styles.formGroup}>
+                <label style={styles.label}>INVITE TTL (SECONDS)</label>
+                <div style={styles.inputWithUnit}>
+                  <input
+                    style={styles.inputNoBorder}
+                    value={ttlSeconds}
+                    onChange={e => setTtlSeconds(e.target.value)}
+                    placeholder="3600"
+                  />
+                  <span style={styles.unit}>SEC</span>
+                </div>
+              </div>
+
+              <button style={styles.generateBtn} onClick={handleGenerateInvite}>
+                <Settings size={16} style={{ marginRight: 8 }} /> GENERATE INVITE
+              </button>
+
+              {inviteUrl && (
+                <div style={styles.inviteSection}>
+                  <div style={styles.inviteHeader}>
+                    <span style={styles.inviteLabel}>YOUR INVITE LINK</span>
+                    <span style={styles.activeDot}>● Active</span>
+                  </div>
+                  <div style={styles.inviteBox}>
+                    <div style={styles.inviteLink}>{inviteUrl}</div>
+                    <button style={styles.copyBtn} onClick={copyToClipboard}>
+                      {copied ? <Check size={14} color="#00ff88" /> : <Copy size={14} color="white" />}
+                    </button>
+                  </div>
+                  <div style={styles.sigConfirmed}>🛡 Signature confirmed on-chain. <a href="#" style={styles.link}>View Transaction</a></div>
+                </div>
               )}
             </div>
 
-            <div style={styles.statsBox}>
-              <div><strong>Total Tasks:</strong> {tasks.length}</div>
-              <div><strong>Team:</strong> {teamId}</div>
+            <div style={styles.card}>
+              <div style={styles.cardHeader}>
+                <h3 style={styles.cardTitle}><Users size={20} style={{ marginRight: 10 }} /> Team Members</h3>
+                <button style={styles.refreshBtn} onClick={fetchMembers}><RefreshCw size={12} /> REFRESH</button>
+              </div>
+
+              <div style={styles.membersArea}>
+                {members.length === 0 ? (
+                  <div style={styles.noMembers}>
+                    <div style={styles.peopleIcon}><Users size={40} style={{ opacity: 0.2 }} /></div>
+                    <h3>No members yet</h3>
+                    <p>Share the secure invite link to add members to your team protocol.</p>
+                    <div style={styles.waitingBadge}>● Waiting for connection...</div>
+                  </div>
+                ) : (
+                  <div style={styles.memberList}>
+                    {members.map((m, i) => (
+                      <div key={i} style={styles.memberRow}>
+                        <div style={styles.memberAvatar}>{i + 1}</div>
+                        <div style={styles.memberHash}>{m}</div>
+                        <div style={styles.memberStatus}>ACTIVE</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div style={styles.footerRow}>
+                <div style={styles.footerStat}>● TOTAL MEMBERS: <span style={{ color: 'white' }}>{members.length}</span></div>
+                <div style={styles.footerStat}>TEAM ID: <span style={styles.teamIdBadge}>{teamId}</span></div>
+              </div>
             </div>
           </div>
+        )}
+
+      </div>
+
+      {/* Footer / Quick View */}
+      <div style={styles.quickView}>
+        <div style={styles.quickLabel}>QUICK TEAM VIEW</div>
+        <div style={styles.linkSimple}>Manage Team Invites</div>
+      </div>
+      <div style={styles.bottomStats}>
+        <div style={styles.bottomCard}>
+          <div style={styles.bottomLabel}>My Role</div>
+          <div style={styles.bottomValue}>Admin</div>
+          <div style={styles.iconPos}>
+            <Shield size={18} color="#333" />
+          </div>
         </div>
-      )}
+        <div style={styles.bottomCard}>
+          <div style={styles.bottomLabel}>Team Members</div>
+          <div style={styles.bottomValue}>{members.length || "0"} Active</div>
+          <div style={styles.membersIcons}>
+            {/* Mock circles */}
+            <div style={styles.circle}></div>
+            <div style={styles.circle}></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   )
 }
 
-const styles = {
+// --- Styles ---
+const styles: any = {
   container: {
-    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     minHeight: "100vh",
-    padding: "40px 20px",
-    fontFamily: "'Segoe UI', sans-serif",
+    background: "#050505",
+    color: "#e0e0e0",
+    fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+    display: "flex",
+    flexDirection: "column",
   },
   header: {
-    textAlign: "center" as const,
-    color: "white",
-    marginBottom: "30px",
+    height: "70px",
+    borderBottom: "1px solid #1a1a1a",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 30px",
+    background: "#080808",
+  },
+  logoArea: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+  },
+  logoIcon: {
+    width: "32px",
+    height: "32px",
+    background: "rgba(0, 255, 136, 0.1)",
+    borderRadius: "6px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: "18px",
+    fontWeight: "800",
+    color: "#ffffff",
+    margin: 0,
+    lineHeight: 1,
   },
   subtitle: {
-    fontSize: "16px",
-    opacity: 0.9,
-    marginTop: "8px",
+    fontSize: "10px",
+    color: "#00ff88",
+    margin: 0,
+    letterSpacing: "1px",
+    opacity: 0.8,
   },
-  walletCard: {
-    background: "rgba(255, 255, 255, 0.2)",
-    border: "1px solid rgba(255, 255, 255, 0.3)",
-    color: "white",
-    padding: "12px 20px",
-    borderRadius: "8px",
-    marginBottom: "20px",
-    maxWidth: "900px",
-    margin: "0 auto 20px",
+  headerTitle: {
+    position: "absolute",
+    left: "50%",
+    transform: "translateX(-50%)",
+    color: "#ffffff",
+    fontSize: "14px",
+    fontWeight: "600",
+  },
+  headerActions: {
     display: "flex",
-    justifyContent: "center",
+    alignItems: "center",
+    gap: "15px",
+  },
+  betaBadge: {
+    background: "#062215",
+    color: "#00ff88",
+    fontSize: "12px",
+    padding: "4px 10px",
+    borderRadius: "20px",
+    border: "1px solid #0a3a22",
+  },
+  walletBadge: {
+    background: "#111",
+    border: "1px solid #333",
+    padding: "6px 12px",
+    borderRadius: "6px",
+    fontSize: "13px",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    color: "#ccc",
+  },
+  walletIcon: {
+    fontSize: "14px",
+  },
+  connectedText: {
+    background: "#1a1a1a",
+    padding: "2px 6px",
+    borderRadius: "4px",
+    fontSize: "10px",
+    color: "#666",
+  },
+  connectBtnSmall: {
+    background: "#00ff88",
+    color: "black",
+    border: "none",
+    padding: "6px 14px",
+    borderRadius: "4px",
+    fontWeight: "bold",
+    fontSize: "12px",
+    cursor: "pointer",
+  },
+
+  statusBar: {
+    height: "40px",
+    background: "rgba(0, 255, 136, 0.03)",
+    borderBottom: "1px solid #1a1a1a",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 30px",
+    fontSize: "12px",
+  },
+  statusLeft: {
+    display: "flex",
+    alignItems: "center",
     gap: "10px",
   },
-  address: {
-    fontFamily: "monospace",
-    background: "rgba(0, 0, 0, 0.2)",
-    padding: "4px 12px",
+  statusDot: {
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    boxShadow: "0 0 5px currentColor",
+  },
+  statusText: {
+    color: "#00ff88",
+    fontWeight: "bold",
+    letterSpacing: "0.5px",
+  },
+  divider: { color: "#333" },
+  sessionText: { color: "#666" },
+  hashTag: {
+    background: "#111",
+    padding: "2px 6px",
     borderRadius: "4px",
+    border: "1px solid #222",
+    fontFamily: "monospace",
+    color: "#aaa"
   },
-  connectBtn: {
-    display: "block",
-    margin: "0 auto 20px",
-    padding: "12px 24px",
-    background: "#4CAF50",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "bold",
+  statusMessage: {
+    color: "#00ff88",
   },
-  status: {
-    padding: "12px 16px",
-    borderRadius: "8px",
-    marginBottom: "20px",
-    maxWidth: "900px",
-    margin: "0 auto 20px",
-    textAlign: "center" as const,
-  },
-  tabs: {
-    display: "flex",
-    gap: "20px",
-    maxWidth: "900px",
-    margin: "0 auto 30px",
-    borderBottom: "2px solid rgba(255, 255, 255, 0.2)",
-    paddingBottom: "0",
-  },
-  tab: {
-    background: "transparent",
-    color: "white",
-    border: "none",
-    padding: "12px 20px",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "bold",
-    opacity: 0.7,
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "30px",
-    maxWidth: "1400px",
+
+  main: {
+    flex: 1,
+    padding: "40px 30px", // Match header padding horizontally
+    // maxWidth removed to fill screen
     margin: "0 auto",
+    width: "100%",
+    boxSizing: "border-box",
   },
+
+  tabNav: {
+    display: "flex",
+    gap: "15px",
+    marginBottom: "30px",
+  },
+  tabBtn: (active: boolean) => ({
+    background: active ? "rgba(0, 255, 136, 0.1)" : "transparent",
+    border: active ? "1px solid #00ff88" : "1px solid #333",
+    color: active ? "#00ff88" : "#888",
+    padding: "10px 20px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontSize: "13px",
+    fontWeight: "600",
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    transition: "all 0.2s",
+  }),
+  sectionHeader: {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "25px",
+    position: "relative",
+  },
+  sectionTitleBorder: {
+    width: "4px",
+    height: "24px",
+    background: "#00ff88",
+    marginRight: "12px",
+    boxShadow: "0 0 8px #00ff88",
+  },
+  sectionTitle: {
+    fontSize: "24px",
+    color: "#fff",
+    margin: 0,
+    fontWeight: "700",
+  },
+  protocolText: {
+    marginLeft: "auto",
+    color: "#444",
+    fontSize: "12px",
+    letterSpacing: "1px",
+    textTransform: "uppercase",
+  },
+
+  contentGrid: (activeTab: string) => ({
+    display: "grid",
+    gridTemplateColumns: activeTab === 'invite' ? "1fr 1fr" : "1fr 1.5fr",
+    gap: "24px",
+    alignItems: "start",
+    width: "100%", // Force full width
+  }),
   card: {
-    background: "white",
-    padding: "30px",
+    background: "#0a0a0a",
+    border: "1px solid #1f1f1f",
     borderRadius: "12px",
-    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.1)",
-  },
-  buttonPrimary: {
+    padding: "24px",
+    position: "relative",
     width: "100%",
-    padding: "12px 20px",
-    background: "#667eea",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
+    boxSizing: "border-box",
+    minWidth: 0, // Critical for preventing grid blowout
+  },
+  cardHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "25px",
+  },
+  cardTitle: {
     fontSize: "16px",
-    fontWeight: "bold",
-    cursor: "pointer",
-    marginBottom: "16px",
+    fontWeight: "600",
+    color: "#fff",
+    margin: 0,
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
   },
-  button: {
-    width: "100%",
-    padding: "10px 16px",
-    background: "#2196F3",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "14px",
-    cursor: "pointer",
-    marginBottom: "16px",
+  plusIcon: { color: "#00ff88" },
+  onChainBadge: {
+    fontSize: "10px",
+    background: "#111",
+    border: "1px solid #333",
+    padding: "4px 8px",
+    borderRadius: "4px",
+    color: "#666",
   },
+
+  formGroup: { marginBottom: "20px" },
+  formGroupHalf: { marginBottom: "20px", flex: 1 },
   label: {
     display: "block",
-    marginBottom: "16px",
+    color: "#666",
+    fontSize: "11px",
+    fontWeight: "bold",
+    marginBottom: "8px",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
   },
   input: {
     width: "100%",
-    padding: "10px 12px",
-    marginTop: "6px",
-    border: "2px solid #e0e0e0",
-    borderRadius: "6px",
-    fontSize: "14px",
-    boxSizing: "border-box" as const,
-  },
-  inviteBox: {
-    background: "#f5f5f5",
-    border: "2px solid #667eea",
-    padding: "16px",
-    borderRadius: "8px",
-    marginTop: "16px",
-  },
-  inviteTitle: {
-    fontWeight: "bold",
-    marginBottom: "10px",
-    color: "#333",
-  },
-  inviteUrlText: {
-    background: "white",
-    padding: "10px",
-    borderRadius: "4px",
-    wordBreak: "break-all" as const,
-    fontSize: "12px",
-    fontFamily: "monospace",
-    marginBottom: "12px",
-    color: "#666",
-  },
-  membersList: {
-    marginTop: "20px",
-    maxHeight: "300px",
-    overflowY: "auto" as const,
-  },
-  memberItem: {
-    display: "flex",
-    alignItems: "center",
+    background: "#0f0f0f",
+    border: "1px solid #2a2a2a",
     padding: "12px",
-    background: "#f9f9f9",
-    borderRadius: "6px",
-    marginBottom: "8px",
-  },
-  memberIcon: {
-    fontSize: "16px",
-    fontWeight: "bold",
-    marginRight: "12px",
-    background: "#667eea",
     color: "white",
-    width: "32px",
-    height: "32px",
+    borderRadius: "6px",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+  },
+  textarea: {
+    width: "100%",
+    background: "#0f0f0f",
+    border: "1px solid #2a2a2a",
+    padding: "12px",
+    color: "white",
+    borderRadius: "6px",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    minHeight: "100px",
+    resize: "vertical",
+    boxSizing: "border-box",
+  },
+  row: { display: "flex", gap: "20px" },
+  select: {
+    width: "100%",
+    background: "#0f0f0f",
+    border: "1px solid #2a2a2a",
+    padding: "12px",
+    color: "white",
+    borderRadius: "6px",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
+    appearance: "none",
+  },
+  inputWithUnit: {
+    background: "#0f0f0f",
+    border: "1px solid #2a2a2a",
+    borderRadius: "6px",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "50%",
+    paddingRight: "12px",
   },
-  memberAddress: {
-    fontFamily: "monospace",
-    color: "#333",
-    fontSize: "14px",
-  },
-  form: {
-    display: "grid",
-    gap: "16px",
-  },
-  formButtons: {
-    display: "flex",
-    gap: "10px",
-  },
-  buttonConfirm: {
+  inputNoBorder: {
     flex: 1,
-    padding: "10px 16px",
-    background: "#4CAF50",
-    color: "white",
+    background: "transparent",
     border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
+    padding: "12px",
+    color: "white",
     fontSize: "14px",
-    fontWeight: "bold",
+    fontFamily: "inherit",
+    outline: "none",
   },
-  tasksList: {
-    display: "grid",
-    gap: "12px",
-    maxHeight: "600px",
-    overflowY: "auto" as const,
-    marginBottom: "20px",
+  unit: { color: "#666", fontSize: "12px", fontWeight: "bold" },
+
+  createChainBtn: {
+    width: "100%",
+    background: "#00ff88",
+    color: "#000",
+    border: "none",
+    padding: "15px",
+    borderRadius: "6px",
+    fontSize: "14px",
+    fontWeight: "800",
+    cursor: "pointer",
+    boxShadow: "0 0 20px rgba(0,255,136,0.2)",
+    marginBottom: "15px",
+    textTransform: "uppercase",
   },
-  taskCard: {
-    background: "#f9f9f9",
-    border: "2px solid #e0e0e0",
-    borderRadius: "8px",
-    padding: "16px",
-  },
-  taskHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: "12px",
-  },
-  taskTitle: {
-    margin: "0 0 6px",
-    color: "#333",
-    fontSize: "16px",
-  },
-  taskDescription: {
-    margin: "0",
-    color: "#666",
-    fontSize: "13px",
-  },
-  badge: {
-    padding: "6px 12px",
-    color: "white",
-    borderRadius: "4px",
-    fontSize: "12px",
-    fontWeight: "bold",
-    whiteSpace: "nowrap" as const,
-  },
-  taskMeta: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: "8px",
-    fontSize: "12px",
-    color: "#666",
-  },
-  metaLabel: {
-    fontWeight: "bold",
-    marginRight: "4px",
-  },
-  statusBadge: {
-    color: "white",
-    padding: "2px 8px",
-    borderRadius: "3px",
+  secureText: {
+    textAlign: "center",
+    color: "#444",
     fontSize: "11px",
   },
-  emptyState: {
-    textAlign: "center" as const,
-    padding: "40px 20px",
-    color: "#999",
+
+  rightCol: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px",
   },
-  smallText: {
-    fontSize: "12px",
-    marginTop: "6px",
+  statsRow: {
+    display: "flex",
+    gap: "20px",
   },
-  statsBox: {
-    background: "#f0f0f0",
-    padding: "16px",
+  statCard: {
+    flex: 1,
+    background: "#0a0a0a",
+    border: "1px solid #1f1f1f",
+    borderRadius: "12px",
+    padding: "20px",
+    position: "relative",
+    overflow: "hidden",
+  },
+  statLabel: {
+    color: "#666",
+    fontSize: "11px",
+    fontWeight: "bold",
+    letterSpacing: "0.5px",
+    marginBottom: "10px",
+  },
+  statValue: {
+    fontSize: "32px",
+    fontWeight: "700",
+    color: "#fff",
+    display: "flex",
+    alignItems: "baseline",
+    gap: "10px",
+  },
+  statSub: { fontSize: "12px", color: "#00ff88" },
+  statSubWarn: { fontSize: "12px", color: "#ff9900" },
+  iconPos: { position: "absolute", top: "20px", right: "20px" },
+
+  registryCard: {
+    flex: 1,
+    background: "#0a0a0a",
+    border: "1px solid #1f1f1f",
+    borderRadius: "12px",
+    display: "flex",
+    flexDirection: "column",
+  },
+  registryHeader: {
+    padding: "20px",
+    borderBottom: "1px solid #1f1f1f",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  listIcon: { color: "#00ff88", marginRight: "10px" },
+  registryActions: { display: "flex", gap: "10px" },
+  iconBtn: { background: "none", border: "none", color: "#666", cursor: "pointer", fontSize: "16px" },
+
+  tableHeader: {
+    display: "flex",
+    padding: "15px 20px",
+    background: "#0e0e0e",
+    color: "#444",
+    fontSize: "10px",
+    fontWeight: "bold",
+    textTransform: "uppercase",
+  },
+  taskList: {
+    padding: "10px",
+    flex: 1,
+    overflowY: "auto",
+    maxHeight: "400px",
+  },
+  taskItem: {
+    background: "#0e0e0e",
+    border: "1px solid #1f1f1f",
+    borderRadius: "8px",
+    padding: "15px",
+    marginBottom: "10px",
+    display: "flex",
+    alignItems: "center",
+    transition: "border-color 0.2s",
+    cursor: "pointer",
+  },
+  taskItemMain: { flex: 2 },
+  taskItemTitle: { color: "white", fontSize: "14px", fontWeight: "600", marginBottom: "4px" },
+  taskItemMeta: { color: "#666", fontSize: "11px" },
+  taskItemPriority: { flex: 1 },
+  priorityBadge: {
+    fontSize: "10px",
+    padding: "3px 8px",
+    borderRadius: "4px",
+    border: "1px solid",
+    fontWeight: "bold",
+    textTransform: "uppercase",
+  },
+  taskItemStatus: { flex: 1 },
+  statusPill: {
+    background: "#111",
+    border: "1px solid #333",
+    padding: "4px 8px",
+    borderRadius: "20px",
+    fontSize: "10px",
+    color: "#aaa",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+  },
+  statusDotSmall: { width: "6px", height: "6px", borderRadius: "50%" },
+  taskItemReward: { flex: 1, textAlign: "right" },
+  rewardValue: { color: "white", fontWeight: "bold", fontSize: "14px" },
+  unitSmall: { color: "#666", fontSize: "10px", marginLeft: "4px" },
+  emptyState: { padding: "40px", textAlign: "center", color: "#444", fontStyle: "italic" },
+
+  // Invite Tab Specific
+  linkIcon: { color: "#00ff88", marginRight: "10px" },
+  securedBadge: { fontSize: "10px", border: "1px solid #333", padding: "2px 6px", textTransform: "uppercase", letterSpacing: "1px", color: "#666" },
+  inputIconWrapper: {
+    display: "flex",
+    background: "#0f0f0f",
+    border: "1px solid #2a2a2a",
+    borderRadius: "6px",
+    alignItems: "center",
+  },
+  inputPrefix: { padding: "0 12px", color: "#666" },
+  inputWithPrefix: {
+    flex: 1,
+    background: "transparent",
+    border: "none",
+    padding: "12px 0",
+    color: "white",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    outline: "none",
+  },
+  generateBtn: {
+    width: "100%",
+    background: "#00ff88",
+    color: "#000",
+    border: "none",
+    padding: "15px",
     borderRadius: "6px",
     fontSize: "14px",
+    fontWeight: "800",
+    cursor: "pointer",
+    boxShadow: "0 0 20px rgba(0,255,136,0.2)",
+    marginBottom: "25px",
+    textTransform: "uppercase",
   },
+  inviteSection: {
+    borderTop: "1px solid #1f1f1f",
+    paddingTop: "20px",
+  },
+  inviteHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    marginBottom: "10px",
+  },
+  inviteLabel: { color: "#00ff88", fontSize: "11px", fontWeight: "bold" },
+  activeDot: { color: "#00ff88", fontSize: "10px", background: "rgba(0,255,136,0.1)", padding: "2px 6px", borderRadius: "10px" },
+  inviteBox: {
+    background: "#111",
+    border: "1px solid #222",
+    borderRadius: "6px",
+    padding: "8px",
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "10px",
+    width: "100%",
+    boxSizing: "border-box",
+  },
+  inviteLink: {
+    flex: 1,
+    padding: "0 12px",
+    color: "#888",
+    fontSize: "12px",
+    fontFamily: "monospace",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    minWidth: 0,
+    maxWidth: "400px", // Explicit constraint
+  },
+  copyBtn: { background: "#222", border: "none", color: "#fff", padding: "8px 12px", borderRadius: "4px", cursor: "pointer" },
+  sigConfirmed: { fontSize: "10px", color: "#555", display: "flex", alignItems: "center", gap: "6px" },
+  link: { color: "#00ff88", textDecoration: "none" },
+
+  refreshBtn: { background: "none", border: "none", color: "#666", fontSize: "10px", cursor: "pointer", textTransform: "uppercase" },
+  membersArea: { flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", minHeight: "300px" },
+  noMembers: { textAlign: "center", color: "#444" },
+  peopleIcon: { fontSize: "40px", marginBottom: "15px", opacity: 0.2 },
+  waitingBadge: { display: "inline-block", marginTop: "20px", background: "rgba(0,255,136,0.05)", color: "#00ff88", padding: "6px 14px", borderRadius: "20px", fontSize: "12px", border: "1px solid #004422" },
+
+  memberList: { width: "100%" },
+  memberRow: { display: "flex", alignItems: "center", padding: "12px", borderBottom: "1px solid #1f1f1f", gap: "15px" },
+  memberAvatar: { width: "24px", height: "24px", background: "#1f1f1f", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "#666" },
+  memberHash: { flex: 1, fontFamily: "monospace", fontSize: "13px", color: "#aaa" },
+  memberStatus: { fontSize: "10px", color: "#00ff88", border: "1px solid #004422", padding: "2px 6px", borderRadius: "4px" },
+
+  footerRow: {
+    borderTop: "1px solid #1f1f1f",
+    paddingTop: "20px",
+    display: "flex",
+    justifyContent: "space-between",
+    fontSize: "11px",
+    color: "#555",
+    textTransform: "uppercase",
+  },
+  teamIdBadge: { background: "#222", padding: "2px 6px", borderRadius: "4px", color: "white" },
+
+  quickView: { padding: "0 60px", marginBottom: "15px", display: "flex", justifyContent: "space-between" },
+  quickLabel: { fontSize: "10px", color: "#666", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px" },
+  linkSimple: { fontSize: "10px", color: "#00ff88", cursor: "pointer", textDecoration: "underline" },
+  bottomStats: { padding: "0 60px 40px", display: "flex", gap: "20px" },
+  bottomCard: { background: "#0c0c0c", padding: "15px 20px", borderRadius: "8px", minWidth: "200px", border: "1px solid #1a1a1a", display: "flex", flexDirection: "column", position: "relative" },
+  bottomLabel: { fontSize: "10px", color: "#555", marginBottom: "4px" },
+  bottomValue: { fontSize: "14px", color: "#fff", fontWeight: "bold" },
+
+  membersIcons: { position: "absolute", right: "20px", top: "50%", transform: "translateY(-50%)", display: "flex" },
+  circle: { width: "20px", height: "20px", background: "#1f1f1f", borderRadius: "50%", marginLeft: "-8px", border: "2px solid #0c0c0c" },
 }
-
-

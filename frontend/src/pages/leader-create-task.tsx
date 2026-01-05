@@ -1,6 +1,17 @@
+
 import { useState } from "react"
-import axios from "axios"
 import { connectWallet } from "../services/wallet"
+import {
+  Wallet,
+  PlusCircle,
+  Check,
+  Calendar,
+  DollarSign,
+  FileText,
+  Clock,
+  Layout,
+  Plus
+} from "lucide-react"
 
 const API = "http://localhost:5000"
 
@@ -46,7 +57,7 @@ export default function LeaderCreateTask() {
     }
 
     const newTask: Task = {
-      id: `task-${Date.now()}`,
+      id: `task - ${Date.now()} `,
       title: form.title,
       description: form.description,
       priority: parseInt(form.priority),
@@ -61,9 +72,9 @@ export default function LeaderCreateTask() {
   }
 
   const getPriorityColor = (priority: number) => {
-    if (priority >= 8) return "#f44336"
-    if (priority >= 5) return "#ff9800"
-    return "#4caf50"
+    if (priority >= 8) return "#ff3333" // Red
+    if (priority >= 5) return "#ff9900" // Orange
+    return "#00ff88" // Green
   }
 
   const getPriorityLabel = (priority: number) => {
@@ -240,187 +251,165 @@ export default function LeaderCreateTask() {
   )
 }
 
-const styles = {
+const styles: any = {
   container: {
-    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     minHeight: "100vh",
-    padding: "40px 20px",
-    fontFamily: "'Segoe UI', sans-serif",
+    background: "#050505",
+    color: "#e0e0e0",
+    fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+    display: "flex",
+    flexDirection: "column",
   },
   header: {
-    textAlign: "center" as const,
-    color: "white",
-    marginBottom: "40px",
-  },
-  subtitle: {
-    fontSize: "16px",
-    opacity: 0.9,
-    marginTop: "8px",
-  },
-  walletCard: {
-    background: "rgba(255, 255, 255, 0.2)",
-    border: "1px solid rgba(255, 255, 255, 0.3)",
-    color: "white",
-    padding: "12px 20px",
-    borderRadius: "8px",
-    marginBottom: "30px",
-    maxWidth: "600px",
-    margin: "0 auto 30px",
+    height: "70px",
+    borderBottom: "1px solid #1a1a1a",
     display: "flex",
-    justifyContent: "center",
-    gap: "10px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 30px",
+    background: "#080808",
   },
-  address: {
-    fontFamily: "monospace",
-    background: "rgba(0, 0, 0, 0.2)",
-    padding: "4px 12px",
-    borderRadius: "4px",
+  logoArea: { display: "flex", alignItems: "center", gap: "12px" },
+  logoIcon: {
+    width: "32px", height: "32px", background: "rgba(0, 255, 136, 0.1)",
+    borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center",
   },
+  title: { fontSize: "18px", fontWeight: "800", color: "#ffffff", margin: 0, lineHeight: 1 },
+  subtitle: { fontSize: "10px", color: "#00ff88", margin: 0, letterSpacing: "1px", opacity: 0.8 },
+  headerTitle: {
+    position: "absolute", left: "50%", transform: "translateX(-50%)",
+    color: "#ffffff", fontSize: "14px", fontWeight: "600",
+  },
+  headerActions: { display: "flex", alignItems: "center", gap: "15px" },
+  walletBadge: {
+    background: "#111", border: "1px solid #333", padding: "6px 12px",
+    borderRadius: "6px", fontSize: "13px", display: "flex", alignItems: "center",
+    gap: "8px", color: "#ccc",
+  },
+  connectedText: { background: "#1a1a1a", padding: "2px 6px", borderRadius: "4px", fontSize: "10px", color: "#666" },
+  connectBtnSmall: {
+    background: "#00ff88", color: "black", border: "none", padding: "6px 14px",
+    borderRadius: "4px", fontWeight: "bold", fontSize: "12px", cursor: "pointer",
+  },
+
+  main: {
+    flex: 1,
+    padding: "40px 30px", // Match header padding
+    width: "100%",
+    boxSizing: "border-box",
+  },
+  sectionHeader: {
+    display: "flex", alignItems: "center", marginBottom: "25px", position: "relative",
+  },
+  sectionTitleBorder: {
+    width: "4px", height: "24px", background: "#00ff88",
+    marginRight: "12px", boxShadow: "0 0 8px #00ff88",
+  },
+  sectionTitle: { fontSize: "24px", color: "#fff", margin: 0, fontWeight: "700" },
+  protocolText: {
+    marginLeft: "auto", color: "#444", fontSize: "12px",
+    letterSpacing: "1px", textTransform: "uppercase",
+  },
+
   grid: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
+    gridTemplateColumns: "1fr 1.5fr",
     gap: "30px",
-    maxWidth: "1400px",
-    margin: "0 auto",
+    alignItems: "start",
+    width: "100%", // Force full width
   },
   card: {
-    background: "white",
-    padding: "30px",
-    borderRadius: "12px",
-    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.1)",
+    background: "#0a0a0a", border: "1px solid #1f1f1f", borderRadius: "12px",
+    padding: "24px", position: "relative",
   },
   cardHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "20px",
+    display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px",
   },
-  buttonConnect: {
-    padding: "8px 16px",
-    background: "#4CAF50",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "14px",
+  cardTitle: {
+    fontSize: "16px", fontWeight: "600", color: "#fff", margin: 0,
+    display: "flex", alignItems: "center", gap: "10px",
   },
-  buttonPrimary: {
-    width: "100%",
-    padding: "12px 20px",
-    background: "#667eea",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "16px",
-    fontWeight: "bold",
-    cursor: "pointer",
-  },
-  button: {
-    flex: 1,
-    padding: "10px 16px",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "14px",
-  },
-  buttonConfirm: {
-    flex: 1,
-    padding: "10px 16px",
-    background: "#4CAF50",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "14px",
-  },
-  form: {
-    display: "grid",
-    gap: "16px",
-  },
-  formButtons: {
-    display: "flex",
-    gap: "10px",
-  },
+  plusIcon: { color: "#00ff88" },
+  listIcon: { color: "#00ff88", marginRight: "10px" },
+
+  form: { display: "flex", flexDirection: "column", gap: "20px" },
+  formGroup: { marginBottom: "5px" },
+  formGroupHalf: { flex: 1 },
   label: {
-    display: "block",
+    display: "block", color: "#666", fontSize: "11px", fontWeight: "bold",
+    marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.5px",
   },
   input: {
-    width: "100%",
-    padding: "10px 12px",
-    marginTop: "6px",
-    border: "2px solid #e0e0e0",
-    borderRadius: "6px",
-    fontSize: "14px",
-    boxSizing: "border-box" as const,
+    width: "100%", background: "#0f0f0f", border: "1px solid #2a2a2a",
+    padding: "12px", color: "white", borderRadius: "6px", fontSize: "14px",
+    fontFamily: "inherit", boxSizing: "border-box",
   },
-  tasksList: {
-    display: "grid",
-    gap: "12px",
-    maxHeight: "600px",
-    overflowY: "auto" as const,
-    marginBottom: "20px",
+  textarea: {
+    width: "100%", background: "#0f0f0f", border: "1px solid #2a2a2a",
+    padding: "12px", color: "white", borderRadius: "6px", fontSize: "14px",
+    fontFamily: "inherit", minHeight: "100px", resize: "vertical", boxSizing: "border-box",
   },
-  taskCard: {
-    background: "#f9f9f9",
-    border: "2px solid #e0e0e0",
-    borderRadius: "8px",
-    padding: "16px",
+  selectWrapper: { position: "relative" },
+  select: {
+    width: "100%", background: "#0f0f0f", border: "1px solid #2a2a2a",
+    padding: "12px", color: "white", borderRadius: "6px", fontSize: "14px",
+    fontFamily: "inherit", boxSizing: "border-box", appearance: "none", cursor: "pointer",
   },
-  taskHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: "12px",
+  inputIconWrapper: {
+    display: "flex", background: "#0f0f0f", border: "1px solid #2a2a2a",
+    borderRadius: "6px", alignItems: "center",
   },
-  taskTitle: {
-    margin: "0 0 6px",
-    color: "#333",
-    fontSize: "16px",
+  inputNoBorder: {
+    flex: 1, background: "transparent", border: "none", padding: "12px",
+    color: "white", fontSize: "14px", fontFamily: "inherit", outline: "none",
   },
-  taskDescription: {
-    margin: "0",
-    color: "#666",
-    fontSize: "13px",
+  row: { display: "flex", gap: "15px", marginBottom: "5px" },
+
+  createChainBtn: {
+    width: "100%", background: "#00ff88", color: "#000", border: "none",
+    padding: "15px", borderRadius: "6px", fontSize: "14px", fontWeight: "800",
+    cursor: "pointer", boxShadow: "0 0 20px rgba(0,255,136,0.2)",
+    display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
   },
-  badge: {
-    padding: "6px 12px",
-    color: "white",
-    borderRadius: "4px",
-    fontSize: "12px",
-    fontWeight: "bold",
-    whiteSpace: "nowrap" as const,
+  cancelBtn: {
+    width: "100%", background: "transparent", border: "1px solid #333", color: "#666",
+    padding: "15px", borderRadius: "6px", fontSize: "12px", fontWeight: "600",
+    cursor: "pointer", marginTop: "10px",
   },
-  taskMeta: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: "8px",
-    fontSize: "12px",
-    color: "#666",
+  formButtons: { marginTop: "10px" },
+
+  registryCard: {
+    flex: 1, background: "#0a0a0a", border: "1px solid #1f1f1f",
+    borderRadius: "12px", display: "flex", flexDirection: "column",
   },
-  metaLabel: {
-    fontWeight: "bold",
-    marginRight: "4px",
+  registryHeader: {
+    padding: "20px", borderBottom: "1px solid #1f1f1f",
+    display: "flex", justifyContent: "space-between", alignItems: "center",
   },
-  statusBadge: {
-    color: "white",
-    padding: "2px 8px",
-    borderRadius: "3px",
-    fontSize: "11px",
+  countBadge: { background: "#111", padding: "2px 8px", borderRadius: "10px", fontSize: "12px", color: "#666", marginLeft: "10px", border: "1px solid #222" },
+  taskList: { padding: "10px", maxHeight: "600px", overflowY: "auto" },
+  emptyState: { padding: "60px", textAlign: "center", color: "#444", fontStyle: "italic" },
+  iconPos: { marginBottom: "15px", display: "flex", justifyContent: "center" },
+
+  taskItem: {
+    background: "#0e0e0e", border: "1px solid #1f1f1f", borderRadius: "8px",
+    padding: "20px", marginBottom: "12px", display: "flex", gap: "20px",
   },
-  emptyState: {
-    textAlign: "center" as const,
-    padding: "40px 20px",
-    color: "#999",
+  taskItemMain: { flex: 1 },
+  taskItemTitle: { color: "white", fontSize: "16px", fontWeight: "700", marginBottom: "6px" },
+  taskItemMeta: { color: "#888", fontSize: "13px", marginBottom: "12px", lineHeight: "1.4" },
+  taskMetaRow: { display: "flex", gap: "15px" },
+  metaWithIcon: { display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "#666", background: "#111", padding: "4px 8px", borderRadius: "4px" },
+
+  taskItemRight: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "10px", minWidth: "100px" },
+  priorityBadge: {
+    fontSize: "10px", padding: "4px 10px", borderRadius: "4px",
+    border: "1px solid", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.5px",
   },
-  smallText: {
-    fontSize: "12px",
-    marginTop: "6px",
+  statusPill: {
+    background: "#111", border: "1px solid #333", padding: "4px 10px",
+    borderRadius: "20px", fontSize: "10px", color: "#aaa",
+    display: "inline-flex", alignItems: "center", gap: "6px",
   },
-  statsBox: {
-    background: "#f0f0f0",
-    padding: "16px",
-    borderRadius: "6px",
-    fontSize: "14px",
-  },
+  statusDotSmall: { width: "6px", height: "6px", borderRadius: "50%" },
 }

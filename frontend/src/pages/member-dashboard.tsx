@@ -313,7 +313,7 @@ export default function MemberDashboard() {
   }
 
   async function initializeWorkspace(taskId: string, claimId: string) {
-    const repoUrl = "https://github.com/saaj376/taskchain.git"
+    const repoUrl = "https://github.com/ThelastC0debenders/Pathway-Hack.git"
     try {
       setWorkspaceLoading(true)
       setWorkspaceError("")

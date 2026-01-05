@@ -22,12 +22,13 @@ const config: HardhatUserConfig = {
 
   networks: {
     localhost: {
+      type: "http",
       url: process.env.POLYGON_RPC_URL || "http://127.0.0.1:8545",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : "remote",
     },
     polygonAmoy: {
       type: "http",
-      url: process.env.POLYGON_RPC_URL || "",
+      url: process.env.POLYGON_RPC_URL || "https://rpc-amoy.polygon.technology",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
   },
