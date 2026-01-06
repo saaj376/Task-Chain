@@ -4,6 +4,9 @@ import { checkWalletConnection, connectWallet } from "../services/wallet"
 import { claimTaskOnChain, completeTaskOnChain } from "../services/contract"
 import confetti from "canvas-confetti"
 import { Monitor, Video, Code, MessageCircle, Trello, Calendar, FileText, Activity } from "lucide-react"
+import type { ContributionReceipt } from "../types/receipt"
+import { generateReceipt } from "../utils/receiptGenerator"
+import { ContributionReceiptCard } from "../components/ContributionReceiptCard"
 
 import { doc, onSnapshot } from "firebase/firestore"
 import { db } from "../services/firebase"
@@ -37,6 +40,7 @@ export default function MemberDashboard() {
   const [claimedTasks, setClaimedTasks] = useState<string[]>([])
   const [callState, setCallState] = useState<any>(null)
   const [dismissedCallId, setDismissedCallId] = useState<string | null>(null)
+  const [receipt, setReceipt] = useState<ContributionReceipt | null>(null)
 
 
   // listen to firestore pushes
@@ -227,13 +231,25 @@ export default function MemberDashboard() {
       })
       setTasks(tasks.map(t => (t.id === taskId ? { ...t, status: "completed" } : t)))
       setClaimedTasks(claimedTasks.filter(id => id !== taskId))
+
+      // Generate Receipt
+      const task = tasks.find(t => t.id === taskId)!
+      const newReceipt = await generateReceipt(
+        taskId,
+        task.title,
+        task.reward || "0 ETH",
+        address,
+        receiptHash
+      )
+      setReceipt(newReceipt)
+
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
         colors: ['#7f5af0', '#14f195', '#00d9f5']
       })
-      alert(`Task #${taskId} completed on-chain`)
+      // alert(`Task #${taskId} completed on-chain`)  <-- Removed alert to show receipt instead
     } catch (err: any) {
       console.error("Error completing task:", err)
       alert("Failed to complete task: " + (err.response?.data?.error || err.message))
@@ -623,6 +639,12 @@ export default function MemberDashboard() {
             ))}
           </div>
         </section>
+      )}
+      {receipt && (
+        <ContributionReceiptCard
+          receipt={receipt}
+          onClose={() => setReceipt(null)}
+        />
       )}
     </div >
   )
