@@ -1,0 +1,11 @@
+[dotenv@17.2.3] injecting env (2) from .env -- tip: ≡ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
+
+Verifying Proof of Work...
+Current Nonce: 9
+Task 3 created.
+Attempting to claim task...
+Task claimed.
+Generated Proof: Hash=0xb29dcd4bccfc09afaaa89481cc499b44f837ad20bccea26d53a5835ca3f923ca, CID=QmTestProof1767735417887
+Γ£à Proof submitted successfully.
+Γ£à Receipt Anchored event verified.
+Γ£à Task state is COMPLETED and hash matches.
