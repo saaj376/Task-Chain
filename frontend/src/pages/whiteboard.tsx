@@ -336,6 +336,32 @@ const Whiteboard = () => {
         }
     }
 
+    const handleCreateTask = async () => {
+        if (!analysisResult || !analysisResult.data) return
+
+        try {
+            const taskData = {
+                teamId: "1", // Corrected to match KanbanBoard default
+                task: {
+                    id: Date.now().toString(),
+                    columnId: "backlog", // Ensure it lands in the first column
+                    title: analysisResult.data.title || "New Task",
+                    description: analysisResult.data.description || "",
+                    priority: "medium", // Match Issue interface
+                    status: "open",
+                    createdAt: new Date().toISOString()
+                }
+            }
+
+            await axios.post("/api/task/create", taskData)
+            alert(`Success! Task "${taskData.task.title}" created.`)
+            setShowAnalysisModal(false)
+        } catch (e: any) {
+            console.error("Task creation failed", e)
+            alert("Failed to create task: " + (e.response?.data?.error || e.message))
+        }
+    }
+
     // --- Tool Actions ---
     const triggerImageUpload = () => fileInputRef.current?.click()
 
@@ -786,7 +812,7 @@ const Whiteboard = () => {
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
                             <button onClick={() => setShowAnalysisModal(false)} style={{ ...styles.textBtn, border: 'none', background: 'transparent' }}>Dismiss</button>
                             <button
-                                onClick={() => { alert(`Create ${analysisResult.type} feature coming soon!`); setShowAnalysisModal(false); }}
+                                onClick={handleCreateTask}
                                 style={{ ...styles.shareBtn, background: '#1e8e3e' }}
                             >
                                 Create {analysisResult.type === 'kanban' ? 'Board' : 'Task'}
