@@ -120,7 +120,7 @@ const KanbanBoard = () => {
     if (!board) return <div style={{ color: 'white', padding: 20 }}>Loading Board...</div>
 
     return (
-        <div style={{ height: '100vh', backgroundColor: '#0d1117', color: '#c9d1d9', display: 'flex', flexDirection: 'column', fontFamily: 'monospace' }}>
+        <div style={{ height: '100vh', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', fontFamily: 'monospace' }}>
             <style>
                 {`
                     @keyframes breathe {
@@ -144,11 +144,11 @@ const KanbanBoard = () => {
                     }
                 `}
             </style>
-            <div style={{ padding: '20px', borderBottom: '1px solid #30363d', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 1, background: '#0d1117' }}>
+            <div style={{ padding: '20px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 1, background: 'var(--bg-secondary)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Layers size={20} color="#00ff88" />
                     <div>
-                        <h2 style={{ color: '#fff', fontSize: '18px', margin: 0 }}>HYPER BOARD :: {board.name}</h2>
+                        <h2 style={{ color: 'var(--text-primary)', fontSize: '18px', margin: 0 }}>HYPER BOARD :: {board.name}</h2>
                         <div style={{ fontSize: '12px', color: '#00ff88' }}>ON-CHAIN TASK MANAGEMENT</div>
                     </div>
                 </div>
@@ -164,9 +164,10 @@ const KanbanBoard = () => {
                     <div key={col.id} style={{
                         flex: 1,
                         minWidth: '280px',
-                        backgroundColor: '#161b22',
+                        backgroundColor: 'var(--bg-secondary)', // #161b22 was hardcoded
                         borderRadius: '6px',
-                        border: '1px solid #30363d',
+                        border: '1px solid var(--card-border-color)', // #30363d was hardcoded
+                        boxShadow: 'var(--card-shadow)',
                         display: 'flex',
                         flexDirection: 'column',
                         position: 'relative',

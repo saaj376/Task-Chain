@@ -118,9 +118,10 @@ const styles: any = {
     container: {
         minHeight: "100vh",
         fontFamily: "'JetBrains Mono', monospace",
-        background: "#050505",
-        color: "#fff",
-        padding: "60px 40px"
+        background: "var(--bg-primary)",
+        color: "var(--text-primary)",
+        padding: "60px 40px",
+        transition: "background 0.3s, color 0.3s"
     },
     header: {
         display: 'flex',
@@ -139,7 +140,7 @@ const styles: any = {
     },
     eyebrow: {
         fontSize: '12px',
-        color: '#666',
+        color: 'var(--text-tertiary)',
         letterSpacing: '2px',
         marginBottom: '8px',
         fontWeight: 'bold'
@@ -154,12 +155,13 @@ const styles: any = {
         gap: '10px'
     },
     tag: {
-        background: '#222',
-        color: '#888',
-        fontSize: '10px',
-        padding: '4px 8px',
-        borderRadius: '4px',
-        fontWeight: 'bold'
+        background: "var(--bg-secondary)",
+        color: "var(--text-secondary)",
+        fontSize: "10px",
+        padding: "4px 8px",
+        borderRadius: "4px",
+        fontWeight: "bold",
+        border: "1px solid var(--border-color)"
     },
     statsGrid: {
         display: 'grid',
@@ -168,11 +170,13 @@ const styles: any = {
         marginBottom: '60px'
     },
     statCard: {
-        background: '#0a0a0a',
-        border: '1px solid #222',
-        padding: '24px',
-        borderRadius: '12px',
-        position: 'relative'
+        background: "var(--bg-secondary)",
+        border: "1px solid var(--card-border-color)",
+        boxShadow: "var(--card-shadow)",
+        padding: "24px",
+        borderRadius: "12px",
+        position: "relative",
+        transition: "box-shadow 0.3s, border-color 0.3s"
     },
     statLabel: {
         fontSize: '10px',
@@ -203,23 +207,25 @@ const styles: any = {
         gap: '10px'
     },
     historyItem: {
-        background: '#0a0a0a',
-        border: '1px solid #222',
-        padding: '20px',
-        borderRadius: '8px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '20px'
+        background: "var(--bg-secondary)",
+        border: "1px solid var(--card-border-color)",
+        boxShadow: "var(--card-shadow)",
+        padding: "20px",
+        borderRadius: "8px",
+        display: "flex",
+        alignItems: "center",
+        gap: "20px",
+        transition: "box-shadow 0.3s, border-color 0.3s"
     },
     eventIcon: {
         width: '32px',
         height: '32px',
-        background: '#111',
+        background: 'var(--bg-tertiary)',
         borderRadius: '50%',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        border: '1px solid #333'
+        border: '1px solid var(--border-color)'
     },
     eventContent: {
         flex: 1

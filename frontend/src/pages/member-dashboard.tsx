@@ -779,14 +779,16 @@ const styles: any = {
     boxShadow: "0 0 10px var(--accent-primary)"
   },
   glassStat: {
-    background: "var(--bg-secondary)", // was rbga(255,255,255,0.03)
-    border: "1px solid var(--border-color)", // was #222
+    background: "var(--bg-secondary)",
+    border: "1px solid var(--card-border-color)",
+    boxShadow: "var(--card-shadow)",
     backdropFilter: "blur(10px)",
     borderRadius: "16px",
     padding: "24px",
     width: "320px",
     position: "relative",
-    overflow: "hidden"
+    overflow: "hidden",
+    transition: "box-shadow 0.3s, border-color 0.3s"
   },
   statRow: {
     display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px"
@@ -868,10 +870,11 @@ const styles: any = {
   },
   card: {
     background: "var(--bg-secondary)", // was #0a0a0a
-    border: "1px solid var(--border-color)", // was #222
+    border: "1px solid var(--card-border-color)", // was #222
+    boxShadow: "var(--card-shadow)",
     borderRadius: "12px",
     padding: "24px",
-    transition: "border-color 0.2s"
+    transition: "box-shadow 0.3s, border-color 0.3s"
   },
   cardTitle: {
     fontSize: "14px", fontWeight: "800", color: "var(--text-primary)", marginBottom: "20px", letterSpacing: "1px", textTransform: "uppercase"
@@ -912,11 +915,12 @@ const styles: any = {
   },
   taskCard: {
     background: "var(--bg-secondary)", // was #0a0a0a
-    border: "1px solid var(--border-color)",
-    borderRadius: "8px",
+    border: "1px solid var(--card-border-color)",
+    boxShadow: "var(--card-shadow)",
+    borderRadius: "12px",
     padding: "24px",
     position: "relative",
-    transition: "transform 0.2s, border-color 0.2s",
+    transition: "box-shadow 0.3s, border-color 0.3s",
   },
   cardTop: {
     display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px"
@@ -969,7 +973,13 @@ const styles: any = {
     display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "24px", marginTop: "40px"
   },
   statCard: {
-    background: "var(--bg-secondary)", border: "1px solid var(--border-color)", padding: "20px", borderRadius: "8px", textAlign: "center"
+    background: "var(--bg-secondary)",
+    border: "1px solid var(--card-border-color)",
+    boxShadow: "var(--card-shadow)",
+    padding: "20px",
+    borderRadius: "8px",
+    textAlign: "center",
+    transition: "box-shadow 0.3s, border-color 0.3s"
   },
 
   // APPS
@@ -978,12 +988,17 @@ const styles: any = {
   },
   appCard: {
     background: "var(--bg-secondary)",
-    border: "1px solid var(--border-color)",
-    padding: "30px", borderRadius: "16px",
-    display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
-    transition: "transform 0.2s, border-color 0.2s",
+    border: "1px solid var(--card-border-color)", // Light mode border
+    boxShadow: "var(--card-shadow)",
+    borderRadius: "12px",
+    padding: "20px",
+    minHeight: "180px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    position: "relative",
+    transition: "transform 0.2s, box-shadow 0.2s, border-color 0.2s",
     cursor: "pointer",
-    minHeight: "200px"
   },
   appIconBox: {
     marginBottom: "20px", padding: "16px", background: "var(--bg-tertiary)", borderRadius: "12px",

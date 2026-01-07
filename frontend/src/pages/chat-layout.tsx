@@ -532,11 +532,13 @@ const styles: any = {
     // Bot Card
     botCard: {
         background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-color)',
+        border: '1px solid var(--card-border-color)',
+        boxShadow: 'var(--card-shadow)',
         borderRadius: '8px',
         padding: '15px',
         marginTop: '5px',
-        minWidth: '400px'
+        minWidth: '400px',
+        transition: "box-shadow 0.3s, border-color 0.3s"
     },
     botHeader: {
         display: 'flex',
@@ -580,7 +582,14 @@ const styles: any = {
     },
     inputWrapper: {
         background: 'var(--bg-secondary)',
-        border: '1px solid var(--accent-primary)',
+        border: '1px solid var(--accent-primary)', // Input often keeps accent color for focus or importance, but could use card-border if desired. User asked for "box like", this is an input box. Let's keep accent for active feel or switch to card-border if they want uniformity. The prompt said "box like components". Input wrapper is a distinct UI element. I'll add the shadow but kept the accent border or make it variable? The original was `var(--accent-primary)`. I'll stick to accent for input focus feel but add the standard shadow if appropriate. Actually, `0 0 20px rgba(0, 255, 136, 0.05)` is a glow. Let's leave input wrapper unique or it might look like a dashboard card.
+        // Wait, user said "border to each component using the colour #2D3C59".
+        // If I change it to #2D3C59 (standard border), it might lose the "active input" feel.
+        // But #2D3C59 IS the new accent primary in light mode (check index.css ... yes `accent-primary: #2D3C59`).
+        // So `border: '1px solid var(--accent-primary)'` IS already using the correct color in light mode!
+        // I will just ensure it has the nice shadow if needed. It has `0 0 20px rgba(0, 255, 136, 0.05)`.
+        // I'll leave it as is or maybe slightly adjust shadow.
+        // I'll leave it as is to avoid breaking input focus aesthetics.
         borderRadius: '12px',
         padding: '12px 16px',
         display: 'flex',

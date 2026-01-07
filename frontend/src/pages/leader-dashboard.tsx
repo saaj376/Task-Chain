@@ -564,10 +564,7 @@ export default function LeaderDashboard() {
       </div>
 
       {/* Footer / Quick View */}
-      <div style={styles.quickView}>
-        <div style={styles.quickLabel}>QUICK TEAM VIEW</div>
-        <div style={styles.linkSimple}>Manage Team Invites</div>
-      </div>
+
       <div style={styles.bottomStats}>
         <div style={styles.bottomCard}>
           <div style={styles.bottomLabel}>My Role</div>
@@ -802,7 +799,8 @@ const styles: any = {
   },
   appCard: {
     background: "var(--bg-secondary)",
-    border: "1px solid var(--border-color)",
+    border: "1px solid var(--card-border-color)",
+    boxShadow: "var(--card-shadow)",
     borderRadius: "12px",
     padding: "30px",
     display: "flex",
@@ -810,7 +808,7 @@ const styles: any = {
     alignItems: "center",
     textAlign: "center",
     cursor: "pointer",
-    transition: "transform 0.2s, border-color 0.2s",
+    transition: "transform 0.2s, box-shadow 0.2s, border-color 0.2s",
     minHeight: "220px",
   },
   appIconBox: {
@@ -848,13 +846,15 @@ const styles: any = {
   },
   card: {
     background: "var(--bg-secondary)",
-    border: "1px solid var(--border-color)",
+    border: "1px solid var(--card-border-color)",
+    boxShadow: "var(--card-shadow)",
     borderRadius: "12px",
     padding: "24px",
     position: "relative",
     width: "100%",
     boxSizing: "border-box",
     minWidth: 0,
+    transition: "box-shadow 0.3s, border-color 0.3s"
   },
   cardHeader: {
     display: "flex",
@@ -981,11 +981,13 @@ const styles: any = {
   statCard: {
     flex: 1,
     background: "var(--bg-secondary)",
-    border: "1px solid var(--border-color)",
+    border: "1px solid var(--card-border-color)",
+    boxShadow: "var(--card-shadow)",
     borderRadius: "12px",
     padding: "20px",
     position: "relative",
     overflow: "hidden",
+    transition: "box-shadow 0.3s, border-color 0.3s"
   },
   statLabel: {
     color: "var(--text-tertiary)",
@@ -1009,10 +1011,12 @@ const styles: any = {
   registryCard: {
     flex: 1,
     background: "var(--bg-secondary)",
-    border: "1px solid var(--border-color)",
+    border: "1px solid var(--card-border-color)",
+    boxShadow: "var(--card-shadow)",
     borderRadius: "12px",
     display: "flex",
     flexDirection: "column",
+    transition: "box-shadow 0.3s, border-color 0.3s"
   },
   registryHeader: {
     padding: "20px",
@@ -1181,10 +1185,10 @@ const styles: any = {
   quickLabel: { fontSize: "10px", color: "var(--text-tertiary)", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px" },
   linkSimple: { fontSize: "10px", color: "var(--accent-primary)", cursor: "pointer", textDecoration: "underline" },
   bottomStats: { padding: "0 60px 40px", display: "flex", gap: "20px" },
-  bottomCard: { background: "var(--bg-secondary)", padding: "15px 20px", borderRadius: "8px", minWidth: "200px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", position: "relative" },
+  bottomCard: { background: "var(--bg-secondary)", padding: "15px 20px", borderRadius: "8px", minWidth: "200px", border: "1px solid var(--card-border-color)", boxShadow: "var(--card-shadow)", display: "flex", flexDirection: "column", position: "relative" },
   bottomLabel: { fontSize: "10px", color: "var(--text-secondary)", marginBottom: "4px" },
   bottomValue: { fontSize: "14px", color: "var(--text-primary)", fontWeight: "bold" },
-
+  
   membersIcons: { position: "absolute", right: "20px", top: "50%", transform: "translateY(-50%)", display: "flex" },
   circle: { width: "20px", height: "20px", background: "var(--bg-tertiary)", borderRadius: "50%", marginLeft: "-8px", border: "2px solid var(--bg-secondary)" },
 }

@@ -285,7 +285,7 @@ const HealthDashboard = () => {
             </ChartContainer>
 
             {/* Top Performers */}
-            <div style={{ background: 'var(--bg-secondary)', padding: 20, borderRadius: 8, border: '1px solid var(--border-color)' }}>
+            <div style={{ background: 'var(--bg-secondary)', padding: 20, borderRadius: 8, border: '1px solid var(--card-border-color)', boxShadow: 'var(--card-shadow)', transition: 'box-shadow 0.3s, border-color 0.3s' }}>
                 <h3 style={{ margin: '0 0 16px', color: 'var(--text-tertiary)', fontSize: 14 }}>TOP PERFORMERS (POWER SCORE) 🏆</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {metrics.topPerformers.map((p, i) => (
@@ -311,10 +311,12 @@ const KpiCard = ({ icon: Icon, title, value, sub, color, isAlert }: any) => (
         background: 'var(--bg-secondary)',
         padding: 20,
         borderRadius: 8,
-        border: isAlert ? `1px solid ${color}` : '1px solid var(--border-color)',
+        border: isAlert ? `1px solid ${color}` : '1px solid var(--card-border-color)',
+        boxShadow: isAlert ? `0 0 10px ${color}40` : 'var(--card-shadow)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 8
+        gap: 8,
+        transition: 'box-shadow 0.3s, border-color 0.3s'
     }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-tertiary)', fontSize: 12 }}>
             {title}
@@ -326,7 +328,7 @@ const KpiCard = ({ icon: Icon, title, value, sub, color, isAlert }: any) => (
 )
 
 const ChartContainer = ({ title, children }: any) => (
-    <div style={{ background: 'var(--bg-secondary)', padding: 20, borderRadius: 8, border: '1px solid var(--border-color)' }}>
+    <div style={{ background: 'var(--bg-secondary)', padding: 20, borderRadius: 8, border: '1px solid var(--card-border-color)', boxShadow: 'var(--card-shadow)', transition: 'box-shadow 0.3s, border-color 0.3s' }}>
         <h3 style={{ margin: '0 0 16px', color: 'var(--text-tertiary)', fontSize: 14 }}>{title}</h3>
         {children}
     </div>

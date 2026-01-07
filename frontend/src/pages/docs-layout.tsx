@@ -222,7 +222,7 @@ const styles: any = {
     sidebar: {
         width: '280px',
         backgroundColor: 'var(--bg-secondary)',
-        borderRight: '1px solid var(--border-color)',
+        borderRight: '1px solid var(--border-color)', // Sidebar border kept simple
         display: 'flex',
         flexDirection: 'column',
     },
@@ -362,11 +362,11 @@ const styles: any = {
     },
     inputCard: {
         background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-color)',
+        border: '1px solid var(--card-border-color)',
         borderRadius: '12px',
         padding: '32px',
         width: '400px',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.4), var(--card-shadow)',
         display: 'flex',
         flexDirection: 'column',
         gap: '20px'

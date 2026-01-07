@@ -149,11 +149,12 @@ export default function LeaderReports({ teamId = "team-123" }: { teamId?: string
 
 const styles: any = {
     container: {
-        background: "#0a0a0a",
+        background: "var(--bg-primary)",
         minHeight: "100%",
         fontFamily: "'JetBrains Mono', monospace",
-        color: "#fff",
-        padding: "30px"
+        color: "var(--text-primary)",
+        padding: "30px",
+        transition: "background 0.3s, color 0.3s"
     },
     header: {
         display: "flex",
@@ -163,7 +164,7 @@ const styles: any = {
     },
     eyebrow: {
         fontSize: "11px",
-        color: "#666",
+        color: "var(--text-secondary)",
         letterSpacing: "2px",
         fontWeight: "bold",
         marginBottom: "8px"
@@ -171,12 +172,13 @@ const styles: any = {
     title: {
         fontSize: "24px",
         margin: 0,
-        fontWeight: "900"
+        fontWeight: "900",
+        color: "var(--text-primary)"
     },
     exportBtn: {
-        background: "#fff",
-        color: "#000",
-        border: "none",
+        background: "var(--bg-secondary)",
+        color: "var(--text-primary)",
+        border: "1px solid var(--border-color)",
         padding: "10px 20px",
         fontSize: "12px",
         fontWeight: "bold",
@@ -184,7 +186,9 @@ const styles: any = {
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
-        gap: "8px"
+        gap: "8px",
+        transition: "all 0.2s",
+        boxShadow: "var(--card-shadow)"
     },
     statsGrid: {
         display: "grid",
@@ -193,33 +197,37 @@ const styles: any = {
         marginBottom: "40px"
     },
     statCard: {
-        background: "#111",
-        border: "1px solid #222",
+        background: "var(--bg-secondary)",
+        border: "1px solid var(--card-border-color)",
+        boxShadow: "var(--card-shadow)",
         padding: "24px",
         borderRadius: "12px",
         display: "flex",
         flexDirection: "column",
-        gap: "10px"
+        gap: "10px",
+        transition: "background 0.3s, box-shadow 0.3s, border-color 0.3s"
     },
     statLabel: {
         fontSize: "10px",
-        color: "#666",
+        color: "var(--text-secondary)",
         letterSpacing: "1px"
     },
     statValue: {
         fontSize: "20px",
-        fontWeight: "bold"
+        fontWeight: "bold",
+        color: "var(--text-primary)"
     },
     section: {
-        background: "#111",
-        border: "1px solid #222",
+        background: "var(--bg-secondary)",
+        border: "1px solid var(--card-border-color)",
+        boxShadow: "var(--card-shadow)",
         borderRadius: "12px",
         marginBottom: "20px",
         overflow: "hidden"
     },
     sectionHeader: {
         padding: "20px",
-        borderBottom: "1px solid #222",
+        borderBottom: "1px solid var(--border-color)",
         display: "flex",
         alignItems: "center",
         gap: "10px"
@@ -228,7 +236,7 @@ const styles: any = {
         fontSize: "12px",
         margin: 0,
         letterSpacing: "1px",
-        color: "#888"
+        color: "var(--text-secondary)"
     },
     chartArea: {
         height: "200px",
@@ -249,32 +257,32 @@ const styles: any = {
     bar: {
         width: "100%",
         maxWidth: "50px",
-        background: "linear-gradient(to top, #00ff88, #00d1ff)",
+        background: "linear-gradient(to top, var(--accent-primary), #00d1ff)",
         borderRadius: "4px 4px 0 0",
         transition: "height 0.3s"
     },
     barLabel: {
         fontSize: "10px",
-        color: "#444"
+        color: "var(--text-secondary)"
     },
     tableControls: {
         padding: "20px",
-        borderBottom: "1px solid #222"
+        borderBottom: "1px solid var(--border-color)"
     },
     searchWrapper: {
         display: "flex",
         alignItems: "center",
         gap: "12px",
-        background: "#0a0a0a",
+        background: "var(--bg-tertiary)",
         padding: "10px 16px",
         borderRadius: "6px",
-        border: "1px solid #333",
+        border: "1px solid var(--border-color)", // Keeping input border subtle
         width: "300px"
     },
     searchInput: {
         background: "transparent",
         border: "none",
-        color: "#fff",
+        color: "var(--text-primary)",
         fontSize: "13px",
         width: "100%",
         outline: "none"
@@ -286,24 +294,25 @@ const styles: any = {
     th: {
         textAlign: "left",
         fontSize: "10px",
-        color: "#666",
+        color: "var(--text-secondary)",
         padding: "15px 20px",
-        borderBottom: "1px solid #222",
+        borderBottom: "1px solid var(--border-color)",
         textTransform: "uppercase"
     },
     tr: {
-        borderBottom: "1px solid #222"
+        borderBottom: "1px solid var(--border-color)"
     },
     td: {
         padding: "15px 20px",
-        fontSize: "13px"
+        fontSize: "13px",
+        color: "var(--text-primary)"
     },
     statusBadge: {
         display: "flex",
         alignItems: "center",
         gap: "8px",
         fontSize: "11px",
-        color: "#aaa"
+        color: "var(--text-secondary)"
     },
     statusDot: {
         width: "6px",
@@ -311,7 +320,7 @@ const styles: any = {
         borderRadius: "50%"
     },
     txLink: {
-        color: "#00d1ff",
+        color: "var(--accent-primary)",
         textDecoration: "none",
         display: "flex",
         alignItems: "center",
@@ -320,7 +329,7 @@ const styles: any = {
     loading: {
         padding: "60px",
         textAlign: "center",
-        color: "#666"
+        color: "var(--text-secondary)"
     },
     error: {
         padding: "60px",

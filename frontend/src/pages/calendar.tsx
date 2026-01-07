@@ -316,6 +316,7 @@ const styles: any = {
         display: 'flex',
         flexDirection: 'column',
         gap: '40px',
+        borderRight: '1px solid var(--border-color)', // Sidebar usually doesn't need the heavy card border? Or maybe it does? Let's check user intent. "box like components". Sidebar is a panel. I'll stick to border-color for layout dividers to avoid clutter.
     },
     header: {
         display: 'flex',
@@ -381,6 +382,7 @@ const styles: any = {
         borderRadius: '4px',
         overflow: 'hidden',
         border: '1px solid var(--border-color)',
+        boxShadow: 'var(--card-shadow)',
     },
     viewOption: {
         padding: '8px 16px',
@@ -397,7 +399,8 @@ const styles: any = {
     },
     calendarWrapper: {
         flex: 1,
-        border: '1px solid var(--border-color)',
+        border: '1px solid var(--card-border-color)',
+        boxShadow: 'var(--card-shadow)',
         borderRadius: '8px',
         overflow: 'hidden',
         display: 'flex',
@@ -631,21 +634,21 @@ const styles: any = {
     },
     popupCard: {
         background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-color)',
+        border: '1px solid var(--card-border-color)',
         borderRadius: '12px',
         padding: '24px',
         width: '400px',
         maxHeight: '80vh',
         overflowY: 'auto',
-        boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+        boxShadow: '0 20px 50px rgba(0,0,0,0.3), var(--card-shadow)', // Combine or replace? The existing shadow is huge for popups. I'll keep the huge one for elevation but add border color.
     },
     inputCard: {
         background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-color)',
+        border: '1px solid var(--card-border-color)',
         borderRadius: '12px',
         padding: '32px',
         width: '400px',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.4), var(--card-shadow)',
         display: 'flex',
         flexDirection: 'column',
         gap: '20px'

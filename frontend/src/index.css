@@ -13,7 +13,10 @@
   --accent-primary: #2D3C59; /* Deep Blue/Navy (Light Mode Base) */
   --accent-secondary: #3b82f6; /* blue-500 */
   
-  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  /* User Requested Light Mode Card Styles */
+  --card-shadow: 0 4px 12px rgba(45, 60, 89, 0.15);
+  --card-border-color: #2D3C59;
+  
   --header-bg: #ffffff;
   --bg-calendar-grid: #ffffff;
   --text-on-accent: #ffffff;
@@ -35,6 +38,8 @@
   --accent-secondary: #00d1ff; /* Trello blue used in existing */
   
   --card-shadow: none;
+  --card-border-color: #222; /* Default dark border */
+  
   --header-bg: #050505;
   --bg-calendar-grid: #090909;
   --text-on-accent: #000000;
