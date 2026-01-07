@@ -19,6 +19,10 @@ export default function Navbar({ title, subtitle, isConnected, address, onConnec
          <div style={styles.logoBox}>
             <div style={styles.logoDot} />
          </div>
+         <div style={styles.brandTextGroup}>
+            <div style={styles.brandTitle}>TaskChain</div>
+            <div style={styles.brandSubtitle}>PROTOCOL CONSOLE</div>
+         </div>
       </div>
 
       <div style={styles.centerGroup}>
@@ -68,8 +72,27 @@ const styles: any = {
   brandGroup: {
     display: "flex",
     alignItems: "center",
-    gap: "16px",
+    gap: "12px",
     zIndex: 2 // Ensure logo stays clickable/visible
+  },
+  brandTextGroup: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    lineHeight: "1.1"
+  },
+  brandTitle: {
+    fontSize: "16px",
+    fontWeight: "bold",
+    color: "var(--text-primary)",
+    letterSpacing: "-0.5px"
+  },
+  brandSubtitle: {
+    fontSize: "10px",
+    fontWeight: "700",
+    color: "var(--accent-primary)",
+    letterSpacing: "1px",
+    textTransform: "uppercase"
   },
   centerGroup: {
     position: "absolute",
@@ -93,13 +116,14 @@ const styles: any = {
     borderRadius: '50%'
   },
   title: {
-    fontSize: "18px",
-    fontWeight: "700",
+    fontSize: "14px", // Reduced size since brand is prominent
+    fontWeight: "600",
     color: "var(--text-primary)",
-    letterSpacing: "-0.5px"
+    letterSpacing: "-0.5px",
+    opacity: 0.8
   },
   subtitle: {
-    fontSize: "12px",
+    fontSize: "10px",
     color: "var(--text-secondary)",
     letterSpacing: "0.5px",
     textTransform: "uppercase"

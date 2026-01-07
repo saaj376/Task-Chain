@@ -13,6 +13,11 @@ const CalendarLayout = () => {
     const [popupEvents, setPopupEvents] = useState<any[]>([])
     const [popupDate, setPopupDate] = useState<Date | null>(null)
 
+    // Modal State for New Event
+    const [showEventInput, setShowEventInput] = useState(false)
+    const [newEventTitle, setNewEventTitle] = useState("")
+    const [eventInputDate, setEventInputDate] = useState<Date | null>(null)
+
     useEffect(() => {
         loadEvents()
     }, [])
@@ -28,16 +33,18 @@ const CalendarLayout = () => {
         setCurrentDate(curr => direction === 'prev' ? subMonths(curr, 1) : addMonths(curr, 1))
     }
 
-    const handleAddEvent = async (date: Date) => {
-        const title = prompt("Event Title:")
-        if (title) {
+    // Consolidated Add Event Logic
+    const confirmAddEvent = async () => {
+        if (newEventTitle && eventInputDate) {
             await calendarService.createEvent({
-                title,
-                start: date.toISOString(),
-                end: date.toISOString(),
+                title: newEventTitle,
+                start: eventInputDate.toISOString(),
+                end: eventInputDate.toISOString(),
                 type: 'meeting'
             })
             loadEvents()
+            setShowEventInput(false)
+            setNewEventTitle("")
         }
     }
 
@@ -105,7 +112,11 @@ const CalendarLayout = () => {
                             return (
                                 <div
                                     key={day.toString()}
-                                    onClick={() => handleAddEvent(day)}
+                                    onClick={() => {
+                                        setEventInputDate(day)
+                                        setShowEventInput(true)
+                                        setNewEventTitle("")
+                                    }}
                                     style={{
                                         ...styles.dayCell,
                                         backgroundColor: isCurrent ? 'var(--bg-secondary)' : 'var(--bg-primary)',
@@ -241,6 +252,32 @@ const CalendarLayout = () => {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* NEW: Input Modal (Replaces Prompt) */}
+            {showEventInput && (
+                <div style={styles.popupOverlay} onClick={() => setShowEventInput(false)}>
+                    <div style={styles.inputCard} onClick={e => e.stopPropagation()}>
+                        <h3 style={styles.inputTitle}>Add New Event</h3>
+                        <p style={styles.inputSubtitle}>
+                            Enter a title for the event on {eventInputDate ? format(eventInputDate, 'MMM do') : ''}
+                        </p>
+                        <input 
+                            style={styles.modalInput}
+                            value={newEventTitle}
+                            onChange={(e) => setNewEventTitle(e.target.value)}
+                            placeholder="Meeting with Team..."
+                            autoFocus
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') confirmAddEvent()
+                            }}
+                        />
+                        <div style={styles.modalActions}>
+                            <button onClick={() => setShowEventInput(false)} style={styles.cancelBtn}>Cancel</button>
+                            <button onClick={confirmAddEvent} style={styles.confirmBtn}>Create Event</button>
                         </div>
                     </div>
                 </div>
@@ -601,6 +638,67 @@ const styles: any = {
         maxHeight: '80vh',
         overflowY: 'auto',
         boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+    },
+    inputCard: {
+        background: 'var(--bg-secondary)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '12px',
+        padding: '32px',
+        width: '400px',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px'
+    },
+    inputTitle: {
+        fontSize: '20px',
+        fontWeight: 'bold',
+        color: 'var(--text-primary)',
+        margin: 0
+    },
+    inputSubtitle: {
+        fontSize: '12px',
+        color: 'var(--text-secondary)',
+        margin: 0
+    },
+    modalInput: {
+        background: 'var(--bg-tertiary)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '6px',
+        padding: '12px',
+        color: 'var(--text-primary)',
+        fontSize: '14px',
+        outline: 'none',
+        width: '100%',
+        boxSizing: 'border-box',
+        transition: 'border-color 0.2s',
+        fontFamily: 'inherit'
+    },
+    modalActions: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        gap: '12px',
+        marginTop: '10px'
+    },
+    cancelBtn: {
+        background: 'transparent',
+        border: '1px solid var(--border-color)',
+        color: 'var(--text-secondary)',
+        padding: '8px 16px',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        fontSize: '12px'
+    },
+    confirmBtn: {
+        background: 'var(--accent-primary)',
+        border: 'none',
+        color: 'var(--text-on-accent)',
+        padding: '8px 20px',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        fontSize: '12px'
     },
     popupHeader: {
         display: 'flex',

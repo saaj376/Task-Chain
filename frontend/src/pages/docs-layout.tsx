@@ -9,6 +9,10 @@ const DocsLayout = () => {
     const [docs, setDocs] = useState<any[]>([])
     const [activeDoc, setActiveDoc] = useState<any | null>(null)
     const [content, setContent] = useState("")
+    
+    // Modal State
+    const [showNewDocModal, setShowNewDocModal] = useState(false)
+    const [newDocTitle, setNewDocTitle] = useState("")
 
     useEffect(() => {
         loadDocs()
@@ -28,12 +32,17 @@ const DocsLayout = () => {
         } catch (e) { console.error(e) }
     }
 
-    const handleCreate = async () => {
-        const title = prompt("Doc Title:")
-        if (title) {
-            const doc = await docsService.createDoc(title)
+    const handleCreate = () => {
+        setNewDocTitle("")
+        setShowNewDocModal(true)
+    }
+
+    const confirmCreateDoc = async () => {
+        if (newDocTitle) {
+            const doc = await docsService.createDoc(newDocTitle)
             loadDocs()
             setActiveDoc(doc)
+            setShowNewDocModal(false)
         }
     }
 
@@ -172,6 +181,31 @@ const DocsLayout = () => {
                     </div>
                 )}
             </div>
+            {/* New Doc Modal */}
+            {showNewDocModal && (
+                <div style={styles.popupOverlay} onClick={() => setShowNewDocModal(false)}>
+                    <div style={styles.inputCard} onClick={e => e.stopPropagation()}>
+                        <h3 style={styles.inputTitle}>Create New Document</h3>
+                        <p style={styles.inputSubtitle}>
+                            Enter a title for your knowledge base article.
+                        </p>
+                        <input 
+                            style={styles.modalInput}
+                            value={newDocTitle}
+                            onChange={(e) => setNewDocTitle(e.target.value)}
+                            placeholder="e.g., API Documentation V2"
+                            autoFocus
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') confirmCreateDoc()
+                            }}
+                        />
+                        <div style={styles.modalActions}>
+                            <button onClick={() => setShowNewDocModal(false)} style={styles.cancelBtn}>Cancel</button>
+                            <button onClick={confirmCreateDoc} style={styles.confirmBtn}>Create Document</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
@@ -312,6 +346,80 @@ const styles: any = {
     emptyIcon: {
         opacity: 0.2,
         marginBottom: '10px',
+    },
+    popupOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.4)',
+        backdropFilter: 'blur(8px)',
+        zIndex: 100,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    inputCard: {
+        background: 'var(--bg-secondary)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '12px',
+        padding: '32px',
+        width: '400px',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px'
+    },
+    inputTitle: {
+        fontSize: '20px',
+        fontWeight: 'bold',
+        color: 'var(--text-primary)',
+        margin: 0
+    },
+    inputSubtitle: {
+        fontSize: '12px',
+        color: 'var(--text-secondary)',
+        margin: 0
+    },
+    modalInput: {
+        background: 'var(--bg-tertiary)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '6px',
+        padding: '12px',
+        color: 'var(--text-primary)',
+        fontSize: '14px',
+        outline: 'none',
+        width: '100%',
+        boxSizing: 'border-box',
+        transition: 'border-color 0.2s',
+        fontFamily: 'inherit'
+    },
+    modalActions: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        gap: '12px',
+        marginTop: '10px'
+    },
+    cancelBtn: {
+        background: 'transparent',
+        border: '1px solid var(--border-color)',
+        color: 'var(--text-secondary)',
+        padding: '8px 16px',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        fontSize: '12px'
+    },
+    confirmBtn: {
+        background: 'var(--accent-primary)',
+        border: 'none',
+        color: 'var(--text-on-accent)',
+        padding: '8px 20px',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        fontSize: '12px'
     }
 }
 
