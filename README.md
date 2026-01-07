@@ -258,7 +258,7 @@ HARDHAT_RPC_URL=http://127.0.0.1:8545
 HARDHAT_CHAIN_ID=31337
 
 # Deployment Account (use Hardhat's default account #0)
-PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+PRIVATE_KEY=private key
 
 # Optional: For mainnet/testnet deployment
 # ETHERSCAN_API_KEY=your_etherscan_api_key
@@ -290,7 +290,7 @@ GOOGLE_API_KEY=your_google_ai_api_key
 ALLOWED_ORIGINS=http://localhost:5173
 
 # Contract Address (update after deployment)
-CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
+CONTRACT_ADDRESS=your contract address
 ```
 
 ### 3. Frontend Configuration
