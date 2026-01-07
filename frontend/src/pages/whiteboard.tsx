@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react"
+import { useParams } from "react-router-dom"
 import { socket } from "../services/socket"
 import {
     MousePointer, Pen, Eraser, StickyNote, Image as ImageIcon,
@@ -89,7 +90,10 @@ const Whiteboard = () => {
     const containerRef = useRef<HTMLDivElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const lastPos = useRef<{ x: number, y: number } | null>(null)
-    const wbId = "default-wb"
+
+    // Router Params
+    const { wbId: paramWbId } = useParams<{ wbId: string }>()
+    const wbId = paramWbId || "default-wb"
 
     // --- Configuration Maps ---
     const brushSettings: Record<BrushType, { width: number, cap: CanvasLineCap, opacity: number }> = {

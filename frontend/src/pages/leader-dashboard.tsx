@@ -45,7 +45,10 @@ interface Task {
   createdBy?: string
 }
 
+import { useNavigate } from "react-router-dom"
+
 export default function LeaderDashboard() {
+  const navigate = useNavigate()
   const [teamId, setTeamId] = useState("team-123")
   const [ttlSeconds, setTtlSeconds] = useState("3600")
   const [address, setAddress] = useState("")
@@ -547,7 +550,7 @@ export default function LeaderDashboard() {
               <div
                 key={i}
                 style={styles.appCard}
-                onClick={() => window.location.href = app.link}
+                onClick={() => navigate(app.link)}
               >
                 <div style={styles.appIconBox}>{app.icon}</div>
                 <h3 style={styles.appTitle}>{app.title}</h3>
